@@ -22,7 +22,4 @@ const modelSauceShema = mongoose.Schema({
     userDisliked: { type: [String]},
 },{paranoid: true})
 
-
-
-
 module.exports = mongoose.model('Sauce',modelSauceShema)
