@@ -1,5 +1,6 @@
 /*****************************************************************************/
 /****************** Import des modules necessaires ***************************/
+const userCtrl = require("../controllers/users")
 
 const express = require('express')
 
