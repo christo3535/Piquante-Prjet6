@@ -3,7 +3,6 @@
 
 const mongoose = require('mongoose')
 
-const DB = require('../app')
 
 /********************************************/
 /******** Definition du modèle Sauce *******/
