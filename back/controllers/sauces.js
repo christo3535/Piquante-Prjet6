@@ -2,6 +2,7 @@
 /************************** Import des modules nécessaires **************/
 
 const Sauce = require('../models/sauce')
+const fs = require('fs')
 
 
 /*********************************************************************************/
@@ -14,6 +15,7 @@ exports.getAllSauces = (req,res)  => {
 }
 
 exports.getSauce = (req,res)  => {
+
   Sauce.findOne({where: {_id:req.params.id}, raw: true})
     .then(sauce => res.status(200).json({data: sauce}))
     .catch(err => res.status(404).json({message: "La sauce n'existe pas", error: err}))
@@ -52,12 +54,24 @@ exports.updateSauce = (req,res) => {
     })
     .catch(err => res.status(500).json({message:'Error', error: err}))
 
-
-
 }
 
 exports.deleteSauce = (req,res)  => {
+  Sauce.findOne({_id: req.params.id})
+      .then(sauce => {
+        if(sauce.userId != req.auth.id){
+          res.status(401).json({message: 'Action non autorisée'})
+        }else{
+          const filename = sauce.imageUrl.split('/images')[1]
+          fs.unlink(`images/${filename}`, () => {
+            Sauce.deleteOne({_id: req.params.id})
+            .then(() => res.status(200).json({message: 'Sauce delete !'}))
+            .catch( error => res.status(401).json({error}))
+          }) 
+        }
+      })
 
+      .catch(error => res.status(500).json({ error }))
 }
 
 exports.likeSauces  = (req,res)  => {
