@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 /**************************************************************************/
 /********************** Enregistrement des nouveaux utilisateurs **********/
 
-exports.login = (req, res) => {
+exports.signup = (req, res) => {
+  console.log('req',req.body);
   bcrypt
     .hash(req.body.password, parseInt(process.env.BCRYPT_SALT_ROUND))
     .then((hash) => {
@@ -15,6 +16,7 @@ exports.login = (req, res) => {
         email: req.body.email,
         password: hash,
       });
+      console.log('user',user);
       user
         .save()
         .then((user) =>
@@ -29,8 +31,8 @@ exports.login = (req, res) => {
     .catch((err) => res.status(500).json({ message: "Error", error: err }));
 };
 
-exports.signup = (req, res) => {
-  User.findOne({ where: { email: req.body.eamil }, raw: true })
+exports.login = (req, res) => {
+  User.findOne( { email: req.body.email })
     .then((user) => {
       //verification si l'utilisateur existe
       if (user === nul) {

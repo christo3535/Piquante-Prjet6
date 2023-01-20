@@ -15,10 +15,12 @@ const modelSauceShema = mongoose.Schema({
     mainPepper: { type:String, require: true},
     imageUrl: { type: String, require: true},
     heat: { type: Number, require: true},
+
+    //Systeme de like - dislike
     likes: { type: Number, default: 0},
     dislikes: { type: Number, default: 0},
-    userLiked: { type: [String]},
-    userDisliked: { type: [String]},
-},{paranoid: true})
+    usersLiked: { type: [String]},
+    usersDisliked: { type: [String]},
+})
 
 module.exports = mongoose.model('Sauce',modelSauceShema)

@@ -2,10 +2,8 @@
 /********************** Import des modules necessaires **********/
 
 const express = require("express");
-
 const multer = require("../middlewares/multer-config");
 const auth = require("../middlewares/auth");
-
 const saucesCtrl = require("../controllers/sauces");
 
 /**********************************************************/
