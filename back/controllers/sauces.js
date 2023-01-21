@@ -93,9 +93,9 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 exports.likeSauces = (req, res) => {
-  const likeOrDislike = req.body.like;
-  const sauceId = req.params.id;
-  const currentUser = req.body.userId;
+  let likeOrDislike = req.body.like;
+  let sauceId = req.params.id;
+  let currentUser = req.body.userId;
 
   console.log('likeSauces');
 
