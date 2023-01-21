@@ -35,7 +35,7 @@ exports.login = (req, res) => {
   User.findOne( { email: req.body.email })
     .then((user) => {
       //verification si l'utilisateur existe
-      if (user === nul) {
+      if (user === null) {
         return res
           .status(401)
           .json({ message: "Identient ou mot de passe incorect" });
@@ -47,7 +47,7 @@ exports.login = (req, res) => {
           if (!test) {
             return res.status(401).json({ message: "Mot de passe incorect" });
           }
-          res.status(200).json({
+         return res.status(200).json({
             userId: user._id,
             token: jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
               expiresIn: process.env.JWT_DURING,
@@ -55,6 +55,7 @@ exports.login = (req, res) => {
           });
         })
         .catch((err) => res.status(500).json({ message: "ERROR", error: err }));
+      
     })
     .catch((err) =>
       res.status(500).json({ message: "Database Error", error: err })

@@ -50,6 +50,7 @@ exports.updateSauce = (req, res, next) => {
           req.file.filename
         }`,
       }
+      //si la sauce n 'est pas transmise 
     : { ...req.body };
 
   delete laSauce._userId;
@@ -77,7 +78,7 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({where:{ _id: req.params.id },raw: true})
     .then((sauce) => {
       if (sauce.userId != req.auth.id) {
-        res.status(401).json({ message: "Action non autorisée" });
+        res.status(401).json({ message: "Action non autorisée !" });
       } else {
         const filename = sauce.imageUrl.split("/images")[1];
         fs.unlink(`images/${filename}`, () => {
@@ -96,10 +97,15 @@ exports.likeSauces = (req, res) => {
   const sauceId = req.params.id;
   const currentUser = req.body.userId;
 
+  console.log('likeSauces');
+
   Sauce.findOne({ _id: sauceId })
   .then((sauceLiked) => {
+    // console.log(sauceLiked);
+    // console.log(typeof likeOrDislike);
     switch (likeOrDislike) {
-      case 1:
+      
+      case '1':
         //verification si l'utilisateur a deja liké la sauce
 
         if (!sauceLiked.usersLiked.includes(currentUser)) {
@@ -107,16 +113,16 @@ exports.likeSauces = (req, res) => {
             { _id: sauceId },
             { $push: { usersLiked: currentUser }, $inc: { like: +1 } }
           )
-            .then(() => res.status(201).json({ message: "Sauce liké" }))
+            .then(() => res.status(201).json({ message: "Sauce liké !" }))
             .catch((error = res.status(400).json(error)));
         } else {
-          res
+         return res
             .status(409)
             .json({ message: "Vous avez deja liké cette sauce !" });
         }
         break;
 
-      case 0:
+      case '0':
         if (sauceLiked.usersLiked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
@@ -131,11 +137,11 @@ exports.likeSauces = (req, res) => {
             { $push: { usersDisliked }, $inc: { dislike: -1 } }
           )
             .then(() => res.status(200).json({ message: "Dislike retiré !" }))
-            .catch((error) => res.status(400).json(error));
+            .catch((error) => res.status(400).json({error}));
         }
         break;
 
-      case -1:
+      case '-1':
         if (!sauceLiked.usersDisliked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
@@ -144,7 +150,7 @@ exports.likeSauces = (req, res) => {
             .then(() => res.status(200).json({ message: "Sauce disliké !" }))
             .catch((error) => res.status(400).json({ error }));
         } else {
-          res
+        return  res
             .status(409)
             .json({ message: "Vous avez déja disliké cette sauce" });
         }
