@@ -3,21 +3,27 @@
 
 const Sauce = require("../models/sauce");
 const fs = require("fs");
+const jwt = require("jsonwebtoken")
 
 /*********************************************************************************/
 /*************************** Routage de la ressource Sauce ***********************/
 
 exports.getAllSauces = (req, res, next) => {
+  console.log('getAllSauces');
   Sauce.find()
-    .then((sauces) => res.status(200).json({ data: sauces }))
+    .then((Sauces) =>  res.status(200).json( Sauces ))
+    
     .catch((err) =>
       res.status(500).json({ message: "Database error", error: err })
     );
 };
 
 exports.getSauce = (req, res, next) => {
-  Sauce.findOne({ where: { _id: req.params.id }, raw: true })
-    .then((sauce) => res.status(200).json({ data: sauce }))
+  
+  console.log(req.params.id)
+
+  Sauce.findOne ({ _id: req.params.id })
+    .then((sauce) => res.status(200).json( sauce ))
     .catch((err) =>
       res.status(404).json({ message: "La sauce n'existe pas", error: err })
     );
@@ -75,7 +81,7 @@ exports.updateSauce = (req, res, next) => {
 };
 
 exports.deleteSauce = (req, res, next) => {
-  Sauce.findOne({where:{ _id: req.params.id },raw: true})
+  Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.id) {
         res.status(401).json({ message: "Action non autorisée !" });
@@ -92,12 +98,12 @@ exports.deleteSauce = (req, res, next) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
-exports.likeSauces = (req, res) => {
-  let likeOrDislike = req.body.like;
-  let sauceId = req.params.id;
-  let currentUser = req.body.userId;
+exports.likeSauces = (req, res, next) => {
+  const likeOrDislike = req.body.like;
+  const sauceId = req.params.id;
+  const currentUser = req.body.userId;
 
-  console.log('likeSauces');
+  
 
   Sauce.findOne({ _id: sauceId })
   .then((sauceLiked) => {
@@ -105,24 +111,24 @@ exports.likeSauces = (req, res) => {
     // console.log(typeof likeOrDislike);
     switch (likeOrDislike) {
       
-      case '1':
+      case 1:
         //verification si l'utilisateur a deja liké la sauce
 
-        if (!sauceLiked.usersLiked.includes(currentUser)) {
+        if (!sauceLiked.usersLiked.includes(currentUser)) { //usersLiked
           Sauce.updateOne(
             { _id: sauceId },
             { $push: { usersLiked: currentUser }, $inc: { like: +1 } }
           )
             .then(() => res.status(201).json({ message: "Sauce liké !" }))
-            .catch((error = res.status(400).json(error)));
+            .catch((error = res.status(400).json(error ? error : {})))
         } else {
-         return res
+          res
             .status(409)
             .json({ message: "Vous avez deja liké cette sauce !" });
         }
         break;
 
-      case '0':
+      case 0:
         if (sauceLiked.usersLiked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
@@ -131,7 +137,7 @@ exports.likeSauces = (req, res) => {
             .then(() => res.status(200).json({ message: "Like rétiré" }))
             .catch((error) => res.status(400).json({ error }));
         }
-        if (sauceLiked.usersDisliked.includes(currentUser)) {
+        if (sauceLiked.usersDisliked.includes(currentUser)) { //usersDisliked
           Sauce.updateOne(
             { _id: sauceId },
             { $push: { usersDisliked }, $inc: { dislike: -1 } }
@@ -141,7 +147,7 @@ exports.likeSauces = (req, res) => {
         }
         break;
 
-      case '-1':
+      case -1:
         if (!sauceLiked.usersDisliked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
@@ -150,7 +156,7 @@ exports.likeSauces = (req, res) => {
             .then(() => res.status(200).json({ message: "Sauce disliké !" }))
             .catch((error) => res.status(400).json({ error }));
         } else {
-        return  res
+          res
             .status(409)
             .json({ message: "Vous avez déja disliké cette sauce" });
         }

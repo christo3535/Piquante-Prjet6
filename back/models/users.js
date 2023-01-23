@@ -13,7 +13,7 @@ const uniqueValidator = require('mongoose-unique-validator')
 const modelUserShema = mongoose.Schema({
     email: { type: String, require: true, unique: true},
     password: { type: String, require: true},
-}) // pour le softDelete
+}) 
 
 modelUserShema.plugin(uniqueValidator)
 

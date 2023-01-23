@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*************************** Importation des modules nécessaires **************/
-const User = require("../models/user");
+const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
