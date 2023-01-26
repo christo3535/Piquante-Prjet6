@@ -14,7 +14,7 @@ const app = express();
 
 app.use(cors({
   origin: "*",
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE' , '0PTION'],
   allowedHeaders: "Origin, X-Requested-With, x-access-token, role, Content, Accept, Content-Type, Authorization"
 }))
 app.use(express.json());
@@ -26,6 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 const user_router = require("./routes/users");
 const sauce_router = require("./routes/sauces");
 const path = require("path");
+
+require('dotenv').config()
 
 /*******************************************************************/
 /************************ Mis en place du routage *****************/

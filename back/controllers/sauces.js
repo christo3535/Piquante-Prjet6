@@ -3,27 +3,26 @@
 
 const Sauce = require("../models/sauce");
 const fs = require("fs");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 /*********************************************************************************/
 /*************************** Routage de la ressource Sauce ***********************/
 
 exports.getAllSauces = (req, res, next) => {
-  console.log('getAllSauces');
   Sauce.find()
-    .then((Sauces) =>  res.status(200).json( Sauces ))
-    
+    .then((Sauces) => res.status(200).json(Sauces))
+
     .catch((err) =>
       res.status(500).json({ message: "Database error", error: err })
     );
 };
 
 exports.getSauce = (req, res, next) => {
+  console.log(req.params.id);
   
-  console.log(req.params.id)
 
-  Sauce.findOne ({ _id: req.params.id })
-    .then((sauce) => res.status(200).json( sauce ))
+  Sauce.findOne({ _id: req.params.id })
+    .then((sauce) => res.status(200).json(sauce))
     .catch((err) =>
       res.status(404).json({ message: "La sauce n'existe pas", error: err })
     );
@@ -32,7 +31,7 @@ exports.getSauce = (req, res, next) => {
 exports.addSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce); //parser la chaine de caractéres envoyer par le front
   delete sauceObject._id;
-  delete sauceObject._userId; 
+  delete sauceObject._userId;
   const laSauce = new Sauce({
     ...sauceObject,
     userId: req.auth.userId,
@@ -49,17 +48,17 @@ exports.addSauce = (req, res, next) => {
 };
 
 exports.updateSauce = (req, res, next) => {
-  const laSauce = req.file
+  const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),
         image: `${req.protocol}://${req.get("host")}/images/${
           req.file.filename
         }`,
       }
-      //si la sauce n 'est pas transmise 
-    : { ...req.body };
+    : //si la sauce n 'est pas transmise
+      { ...req.body };
 
-  delete laSauce._userId;
+  delete sauceObject._userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
@@ -69,7 +68,7 @@ exports.updateSauce = (req, res, next) => {
       } else {
         Sauce.updateOne(
           { _id: req.params.id },
-          { ...laSauce, _id: req.params.id }
+          { ...sauceObject, _id: req.params.id }
         )
           .then(() => res.status(200).json({ message: "Sauce update" }))
           .catch((err) =>
@@ -103,24 +102,22 @@ exports.likeSauces = (req, res, next) => {
   const sauceId = req.params.id;
   const currentUser = req.body.userId;
 
-  
-
-  Sauce.findOne({ _id: sauceId })
-  .then((sauceLiked) => {
+  Sauce.findOne({ _id: sauceId }).then((sauceLiked) => {
     // console.log(sauceLiked);
+    console.log("sauceID");
     // console.log(typeof likeOrDislike);
     switch (likeOrDislike) {
-      
       case 1:
         //verification si l'utilisateur a deja liké la sauce
 
-        if (!sauceLiked.usersLiked.includes(currentUser)) { //usersLiked
+        if (!sauceLiked.usersLiked.includes(currentUser)) {
+          //usersLiked
           Sauce.updateOne(
             { _id: sauceId },
             { $push: { usersLiked: currentUser }, $inc: { like: +1 } }
           )
             .then(() => res.status(201).json({ message: "Sauce liké !" }))
-            .catch((error = res.status(400).json(error ? error : {})))
+            .catch((error = res.status(400).json({ error })));
         } else {
           res
             .status(409)
@@ -137,13 +134,14 @@ exports.likeSauces = (req, res, next) => {
             .then(() => res.status(200).json({ message: "Like rétiré" }))
             .catch((error) => res.status(400).json({ error }));
         }
-        if (sauceLiked.usersDisliked.includes(currentUser)) { //usersDisliked
+        if (sauceLiked.usersDisliked.includes(currentUser)) {
+          //usersDisliked
           Sauce.updateOne(
             { _id: sauceId },
-            { $push: { usersDisliked }, $inc: { dislike: -1 } }
+            { $push: { usersDisliked: currentUser }, $inc: { dislike: -1 } }
           )
             .then(() => res.status(200).json({ message: "Dislike retiré !" }))
-            .catch((error) => res.status(400).json({error}));
+            .catch((error) => res.status(400).json({ error }));
         }
         break;
 
@@ -151,7 +149,7 @@ exports.likeSauces = (req, res, next) => {
         if (!sauceLiked.usersDisliked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
-            { $push: { usersDisliked }, $inc: { dislike: -1 } }
+            { $push: { usersDisliked: currentUser }, $inc: { dislike: -1 } }
           )
             .then(() => res.status(200).json({ message: "Sauce disliké !" }))
             .catch((error) => res.status(400).json({ error }));
