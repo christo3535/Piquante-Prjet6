@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 /******** Definition du modèle Sauce *******/
 
 const modelSauceShema = mongoose.Schema({
-  userID: { type: String, require: true },
+  userId: { type: String, require: true },
   name: { type: String, require: true },
   manufacturer: { type: String, require: true },
   description: { type: String, require: true },
