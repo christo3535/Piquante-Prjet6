@@ -31,7 +31,7 @@ exports.getSauce = (req, res, next) => {
 exports.addSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce); //parser la chaine de caractéres envoyer par le front
   delete sauceObject._id;
-  delete sauceObject._userId;
+  delete sauceObject._userId;//par mesure de securité supression de userId venant de la requete
   const laSauce = new Sauce({
     ...sauceObject,
     userId: req.auth.userId,
@@ -49,17 +49,18 @@ exports.addSauce = (req, res, next) => {
 };
 
 exports.updateSauce = (req, res, next) => {
-    // on crée un objet qui regarde si req.file existe ou non.
+    // creation d'un un objet et  verification si  req.file existe ou non.
     const sauceObject = req.file ? {
       ...JSON.parse(req.body.sauce),//on récupère l'objet en parsant la chaine de caractères
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` 
   } : {...req.body}; // si pas d'objet on le récupère dans le corp de la requête
-  //on supprime le userId venant de la requête
+
+  //par mesure de securité on supprime le userId venant de la requête
   delete sauceObject.userId;
 
   Sauce.findOne({_id: req.params.id})
       .then((sauce) => {
-          // On vérifie si l'auteur de la sauce est bien la personne connectée
+          // On vérifie si le createur  de la sauce est bien le user  connecté
           // si ce n'est pas le cas, on renvoie un message d'erreur
           if (sauce.userId !== req.auth.userId) {
               res.status(401).json({message: 'Requête non autorisée !'});
@@ -75,9 +76,9 @@ exports.updateSauce = (req, res, next) => {
               }
               // S'il existe, il faut supprimer l'ancienne image dans le dossier 'images'
               else {
-                  // On récupère le nom du fichier de l'image de la sauce dans le dossier images
+                  // Verification du nom du fichier de l'image de la sauce dans le dossier images
                   const filename = sauce.imageUrl.split('/images/')[1];
-                  // Et, on le supprime avec 'unlink', puis on met à jour les modifications
+                  // Supprimer avec 'unlink' de l'image, puis mise à jour des modifications
                   fs.unlink(`images/${filename}`, () => {
                       Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                           .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
@@ -96,7 +97,7 @@ exports.updateSauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {//id or userId
+      if (sauce.userId != req.auth.userId) {
         res.status(401).json({ message: "Action non autorisée !" });
       } else {
         const filename = sauce.imageUrl.split("/images")[1];
@@ -159,10 +160,7 @@ exports.likeSauces = (req, res, next) => {
         }
         break;
 
-        
-
       case -1:
-        //verifie si l'utilisateur n'a pas déja duslike la sauce
         if (!sauceLiked.usersDisliked.includes(currentUser)) {
           Sauce.updateOne(
             { _id: sauceId },
