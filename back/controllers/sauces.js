@@ -58,21 +58,21 @@ exports.updateSauce = (req, res, next) => {
 
   Sauce.findOne({_id: req.params.id})
       .then((sauce) => {
-          // On vérifie si le createur  de la sauce est bien le user  connecté
+          // Verification si le createur  de la sauce est bien le userId  connecté
           // si ce n'est pas le cas, on renvoie un message d'erreur
           if (sauce.userId !== req.auth.userId) {
               res.status(401).json({message: 'Requête non autorisée !'});
           }
           else {
-              // On récupère le contenu du fichier image dans la requête
+              // Récupération du contenu du fichier image 
               const testFile = req.file;
-              // S'il n'existe pas, on met simplement à jour les modifications
+              // S'il n'existe pas, mise  à jour des modifications
               if (!testFile) {
                   Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                       .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
                       .catch(error => res.status(401).json({error}));
               }
-              // S'il existe, il faut supprimer l'ancienne image dans le dossier 'images'
+              // S'il existe,suppression de  l'ancienne image dans le dossier 'images'
               else {
                   // Verification du nom du fichier de l'image de la sauce dans le dossier images
                   const filename = sauce.imageUrl.split('/images/')[1];
@@ -147,7 +147,7 @@ exports.likeSauces = (req, res, next) => {
             .catch((error) => res.status(400).json({ error }));
         }
         if (sauceLiked.usersDisliked.includes(currentUser)) {
-          //usersDisliked
+          
           Sauce.updateOne(
             { _id: sauceId },
             { $pull: { usersDisliked: currentUser }, $inc: { dislikes: -1 } }
