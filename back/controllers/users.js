@@ -1,3 +1,5 @@
+
+
 /******************************************************************************/
 /*************************** Importation des modules nécessaires **************/
 const User = require("../models/users");
@@ -8,7 +10,7 @@ const jwt = require("jsonwebtoken");
 /********************** Enregistrement des nouveaux utilisateurs **********/
 
 exports.signup = (req, res) => {
-  console.log('req',req.body);
+  
   bcrypt
     .hash(req.body.password, parseInt(process.env.BCRYPT_SALT_ROUND))
     .then((hash) => {
@@ -16,7 +18,7 @@ exports.signup = (req, res) => {
         email: req.body.email,
         password: hash,
       });
-      console.log('user',user);
+    
       user
         .save()
         .then((user) =>

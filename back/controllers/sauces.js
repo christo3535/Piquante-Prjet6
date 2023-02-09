@@ -19,8 +19,6 @@ exports.getAllSauces = (req, res, next) => {
 
 exports.getSauce = (req, res, next) => {
   
-
-
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
     .catch((err) =>
@@ -29,6 +27,7 @@ exports.getSauce = (req, res, next) => {
 };
 
 exports.addSauce = (req, res, next) => {
+  
   const sauceObject = JSON.parse(req.body.sauce); //parser la chaine de caractéres envoyer par le front
   delete sauceObject._id;
   delete sauceObject._userId;//par mesure de securité supression de userId venant de la requete
@@ -37,8 +36,7 @@ exports.addSauce = (req, res, next) => {
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
-    }`
-    
+    }` 
   });
   laSauce
     .save()
@@ -53,7 +51,7 @@ exports.updateSauce = (req, res, next) => {
     const sauceObject = req.file ? {
       ...JSON.parse(req.body.sauce),//on récupère l'objet en parsant la chaine de caractères
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` 
-  } : {...req.body}; // si pas d'objet on le récupère dans le corp de la requête
+  } : {...req.body}; // si pas d'objet on le récupère dans le corps de la requête
 
   //par mesure de securité on supprime le userId venant de la requête
   delete sauceObject.userId;
@@ -78,7 +76,7 @@ exports.updateSauce = (req, res, next) => {
               else {
                   // Verification du nom du fichier de l'image de la sauce dans le dossier images
                   const filename = sauce.imageUrl.split('/images/')[1];
-                  // Supprimer avec 'unlink' de l'image, puis mise à jour des modifications
+                  // Supprimer avec 'unlink'  l'image, puis mise à jour des modifications
                   fs.unlink(`images/${filename}`, () => {
                       Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                           .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
@@ -100,10 +98,10 @@ exports.deleteSauce = (req, res, next) => {
       if (sauce.userId != req.auth.userId) {
         res.status(401).json({ message: "Action non autorisée !" });
       } else {
-        const filename = sauce.imageUrl.split("/images")[1];
+        const filename = sauce.imageUrl.split('/images')[1];
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: "Sauce delete !" }))
+            .then(() => res.status(200).json({ message: "Sauce suprimé !" }))
             .catch((error) => res.status(401).json({ error }));
         });
       }
@@ -124,7 +122,6 @@ exports.likeSauces = (req, res, next) => {
         //verification si l'utilisateur a deja liké la sauce
 
         if (!sauceLiked.usersLiked.includes(currentUser)) {
-          //usersLiked
           Sauce.updateOne(
             { _id: sauceId },
             { $push: { usersLiked: currentUser }, $inc: { likes: +1 } }
@@ -175,6 +172,11 @@ exports.likeSauces = (req, res, next) => {
             .json({ message: "Vous avez déja disliké cette sauce" });
         }
         break;
+        default: console.log('error');
     }
   });
 };
+
+/******************************************************************* */
+
+

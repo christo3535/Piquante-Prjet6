@@ -4,6 +4,8 @@
   "description": "",
   "main": "servers.js",
   "scripts": {
+    
+    "starts": "node -r dotenv/config server.js",
     "start": "nodemon -r dotenv/config server.js"
   },
   "keywords": [],
@@ -14,6 +16,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "helmet": "^6.0.1",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.3",
     "mongoose-unique-validator": "^3.1.0",

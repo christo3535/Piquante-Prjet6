@@ -6,8 +6,8 @@ const multer = require("../middlewares/multer-config");
 const auth = require("../middlewares/auth");
 const saucesCtrl = require("../controllers/sauces");
 
-/**********************************************************/
-/********************** Récupération du router d'express */
+/************************************************************************/
+/********************** Récupération du router d'express ***************/
 const router = express.Router();
 
 /************************************************************/

@@ -1,20 +1,21 @@
-/**********************************************/
+/*****************************************************************/
 /**************** Import des modules necessaires ****************/
 
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const helmet = require('helmet');
 
 
 
-/************************************************/
+/*************************************************************/
 /***************** Initialisation de l' API *****************/
 
 const app = express();
 
 app.use(cors({
   origin: "*",
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE' , '0PTION'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE' , '0PTIONS'],
   allowedHeaders: "Origin, X-Requested-With, x-access-token, role, Content, Accept, Content-Type, Authorization"
 }))
 app.use(express.json());
@@ -22,12 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 
 /********************************************************************/
 /***************** Import des modules du routage *******************/
-
+ 
 const user_router = require("./routes/users");
 const sauce_router = require("./routes/sauces");
 const path = require("path");
 
-require('dotenv').config()
+
 
 /*******************************************************************/
 /************************ Mis en place du routage *****************/
@@ -42,6 +43,9 @@ app.use("/api/sauces", sauce_router);
 
 
 app.all("*", (req, res) => res.status(501).send("Mauvaise recherche"));
+//  app.use(helmet())
+
+
 
 /*************************************************************/
 /******************************* Start du serveur  ***********/
@@ -59,5 +63,12 @@ mongoose
       console.log("Connexion à MongoDB réussie !");
     });
   })
+  
 
   .catch(() => console.log("Connexion à MongoDB échouée !"));
+
+  app.use(helmet({
+    //Seules les demandes provenant du même site peuvent lire la ressource
+    crossOriginResourcePolicy: { policy: "same-site" }
+  }));
+  
