@@ -1,9 +1,10 @@
 
 /*****************************************************************************/
 /****************** Import des modules necessaires ***************************/
+const express = require('express')
+
 const userCtrl = require("../controllers/users")
 
-const express = require('express')
 
 /************************************************************************/
 /******************* Récuperation du routeur d'express *****************/

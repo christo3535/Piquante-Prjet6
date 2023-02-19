@@ -8,11 +8,17 @@ const helmet = require('helmet');
 const rateLimite = require("express-rate-limit")
 
 
-
 /*************************************************************/
 /***************** Initialisation de l' API *****************/
 
 const app = express();
+
+
+const limiter = rateLimite({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limite chaque IP à 100 requêtes par windowMs
+  message: "Pour plus de requêtes essayez plus tard"
+})
 
 app.use(cors({
   origin: "*",
@@ -21,12 +27,18 @@ app.use(cors({
 }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const limiter = rateLimite({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limite chaque IP à 100 requêtes par windowMs
-  message: "Pour plus de requêtes essayez plus tard"
-})
 
+app.use(helmet({
+  //Seules les demandes provenant du même site peuvent lire la ressource
+  crossOriginResourcePolicy: { policy: "same-site" }
+}));
+
+app.use(limiter)
+
+app.use(function (req, res, next) {  
+  res.header("X-powered-by", "Blood, sweat, and tears.");
+  next();
+});
 /********************************************************************/
 /***************** Import des modules du routage *******************/
  
@@ -39,14 +51,7 @@ const path = require("path");
 /*******************************************************************/
 /************************ Mis en place du routage *****************/
 
-app.get("/", (req, res) => res.send("Je suis encore online!!!!!"));
-
-app.use(helmet({
-  //Seules les demandes provenant du même site peuvent lire la ressource
-  crossOriginResourcePolicy: { policy: "same-site" }
-}));
-
-app.use(limiter)
+app.get("/", (req, res) => res.send("Je suis online!!!!!"));
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
@@ -56,7 +61,7 @@ app.use("/api/sauces", sauce_router);
 
 
 app.all("*", (req, res) => res.status(501).send("Mauvaise recherche"));
-//  app.use(helmet())
+
 
 
 
@@ -65,6 +70,7 @@ app.all("*", (req, res) => res.status(501).send("Mauvaise recherche"));
 /******************************* Start du serveur  ***********/
 
 mongoose
+  .set('strictQuery',true)//preparation pour une evolution future
   .connect(process.env.DB_CONNECT, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -76,6 +82,7 @@ mongoose
       );
       console.log("Connexion à MongoDB réussie !");
     });
+    
   })
   
 

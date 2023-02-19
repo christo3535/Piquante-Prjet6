@@ -47,11 +47,11 @@ exports.addSauce = (req, res, next) => {
 };
 
 exports.updateSauce = (req, res, next) => {
-    // creation d'un un objet et  verification si  req.file existe ou non.
+    // creation d'un un objet et  verification si  req.file existe ou pas.
     const sauceObject = req.file ? {
-      ...JSON.parse(req.body.sauce),//on récupère l'objet en parsant la chaine de caractères
+      ...JSON.parse(req.body.sauce),//récupèration de l'objet en parsant la chaine de caractères
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` 
-  } : {...req.body}; // si pas d'objet on le récupère dans le corps de la requête
+  } : {...req.body}; // si pas d'objet récupèration dans le corps de la requête
 
   //par mesure de securité on supprime le userId venant de la requête
   delete sauceObject.userId;
@@ -72,11 +72,11 @@ exports.updateSauce = (req, res, next) => {
                       .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
                       .catch(error => res.status(401).json({error}));
               }
-              // S'il existe,suppression de  l'ancienne image dans le dossier 'images'
+              // Si le fichier existe,suppression de  l'ancienne image dans le dossier 'images'
               else {
                   // Verification du nom du fichier de l'image de la sauce dans le dossier images
                   const filename = sauce.imageUrl.split('/images/')[1];
-                  // Supprimer avec 'unlink'  l'image, puis mise à jour des modifications
+                  // Suppretion avec 'unlink' de  l'image, puis mise à jour des modifications
                   fs.unlink(`images/${filename}`, () => {
                       Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                           .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
@@ -177,6 +177,6 @@ exports.likeSauces = (req, res, next) => {
   });
 };
 
-/******************************************************************* */
+
 
 
