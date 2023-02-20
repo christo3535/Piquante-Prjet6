@@ -50,11 +50,11 @@ exports.updateSauce = (req, res, next) => {
     // creation d'un un objet et  verification si  req.file existe ou pas.
     const sauceObject = req.file ? {
       ...JSON.parse(req.body.sauce),//récupèration de l'objet en parsant la chaine de caractères
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` 
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` //recreation de la variable imageUrl
   } : {...req.body}; // si pas d'objet récupèration dans le corps de la requête
 
   //par mesure de securité on supprime le userId venant de la requête
-  delete sauceObject.userId;
+  delete sauceObject._userId;
 
   Sauce.findOne({_id: req.params.id})
       .then((sauce) => {
@@ -68,6 +68,7 @@ exports.updateSauce = (req, res, next) => {
               const testFile = req.file;
               // S'il n'existe pas, mise  à jour des modifications
               if (!testFile) {
+                //quel est l'enregistrement à mettre a jour et avec quel objet
                   Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                       .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
                       .catch(error => res.status(401).json({error}));
@@ -98,7 +99,7 @@ exports.deleteSauce = (req, res, next) => {
       if (sauce.userId != req.auth.userId) {
         res.status(401).json({ message: "Action non autorisée !" });
       } else {
-        const filename = sauce.imageUrl.split('/images')[1];
+        const filename = sauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => res.status(200).json({ message: "Sauce suprimé !" }))

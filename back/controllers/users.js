@@ -35,7 +35,7 @@ exports.signup = (req, res) => {
 };
 
 exports.login = (req, res) => {
-  User.findOne( { email: req.body.email })
+  User.findOne( { email: req.body.email })//selecteur
     .then((user) => {
       //verification si l'utilisateur existe
       if (user === null) {

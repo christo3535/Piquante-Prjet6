@@ -11,7 +11,7 @@ const rateLimite = require("express-rate-limit")
 /*************************************************************/
 /***************** Initialisation de l' API *****************/
 
-const app = express();
+const app = express();//serveur sur lequel va fonctionner l'API
 
 
 const limiter = rateLimite({
@@ -51,10 +51,11 @@ const path = require("path");
 /*******************************************************************/
 /************************ Mis en place du routage *****************/
 
-app.get("/", (req, res) => res.send("Je suis online!!!!!"));
+app.get("/", (req, res) => res.send("Je suis online!!!!!"));//la route par default +fonction
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
+//Routes attendus par le front
 app.use("/api/auth", user_router);
 
 app.use("/api/sauces", sauce_router);
