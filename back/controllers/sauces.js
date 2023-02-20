@@ -74,7 +74,7 @@ exports.updateSauce = (req, res, next) => {
               }
               // Si le fichier existe,suppression de  l'ancienne image dans le dossier 'images'
               else {
-                  // Verification du nom du fichier de l'image de la sauce dans le dossier images
+                  // Récupération du nom du fichier 
                   const filename = sauce.imageUrl.split('/images/')[1];
                   // Suppretion avec 'unlink' de  l'image, puis mise à jour des modifications
                   fs.unlink(`images/${filename}`, () => {
