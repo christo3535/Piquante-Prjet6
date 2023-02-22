@@ -17,7 +17,7 @@ router.get("", auth, saucesCtrl.getAllSauces);
 
 router.get("/:id", auth, saucesCtrl.getSauce);
 
-router.post("",auth, multer, saucesCtrl.addSauce);
+router.post("", auth, multer, saucesCtrl.addSauce);
 
 router.put("/:id", auth, multer, saucesCtrl.updateSauce);
 

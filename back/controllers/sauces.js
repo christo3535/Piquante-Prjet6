@@ -34,7 +34,7 @@ exports.addSauce = (req, res, next) => {
   const laSauce = new Sauce({
     ...sauceObject,
     userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${//generer Url de l'image
       req.file.filename
     }` 
   });
@@ -56,19 +56,18 @@ exports.updateSauce = (req, res, next) => {
   //par mesure de securité on supprime le userId venant de la requête
   delete sauceObject._userId;
 
-  Sauce.findOne({_id: req.params.id})
+  Sauce.findOne({_id: req.params.id})//recuperer l'objet en BD
       .then((sauce) => {
           // Verification si le createur  de la sauce est bien le userId  connecté
-          // si ce n'est pas le cas, on renvoie un message d'erreur
           if (sauce.userId !== req.auth.userId) {
               res.status(401).json({message: 'Requête non autorisée !'});
           }
           else {
-              // Récupération du contenu du fichier image 
+              // Récupération du contenu du fichier image dans la req
               const testFile = req.file;
               // S'il n'existe pas, mise  à jour des modifications
               if (!testFile) {
-                //quel est l'enregistrement à mettre a jour et avec quel objet
+                // l'enregistrement à mettre a jour et l'objet
                   Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                       .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
                       .catch(error => res.status(401).json({error}));
@@ -77,7 +76,7 @@ exports.updateSauce = (req, res, next) => {
               else {
                   // Récupération du nom du fichier 
                   const filename = sauce.imageUrl.split('/images/')[1];
-                  // Suppretion avec 'unlink' de  l'image, puis mise à jour des modifications
+                  // Suppretion avec 'unlink' de  l'image dans le repertoire images, puis mise à jour des modifications
                   fs.unlink(`images/${filename}`, () => {
                       Sauce.updateOne({_id: req.params.id}, {...sauceObject, _id: req.params.id})
                           .then(() => res.status(200).json({message: 'Sauce modifiée!'}))
